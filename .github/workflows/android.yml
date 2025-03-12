@@ -20,18 +20,25 @@ jobs:
         distribution: 'temurin'
         java-version: 11
 
+    - name: Set up Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: 9.0  # 你可以换成适合你的 Gradle 版本
+
     - name: Regenerate Gradle Wrapper
+      working-directory: NavidromeMusicPlayer
       run: |
-        cd NavidromeMusicPlayer
-        ## ./gradlew wrapper --gradle-version 8.5
-          
+        echo "gradlew versiong is:"
+        ./gradlew --version
+        echo "downgrade to use version 8.5"
+        ./gradlew wrapper --gradle-version 8.5
 
     - name: Build with Gradle
+      working-directory: NavidromeMusicPlayer
       run: |
         echo now directory
         pwd
-        echo list files
+        echo "list files"
         ls
-        echo start build
-        cd NavidromeMusicPlayer
+        echo "start build..."
         ./gradlew assembleDebug
