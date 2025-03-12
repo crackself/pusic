@@ -23,7 +23,7 @@ jobs:
     - name: Set up Gradle
       uses: gradle/gradle-build-action@v2
       with:
-        gradle-version: 9.0  # 你可以换成适合你的 Gradle 版本
+        gradle-version: 8.5  # 你可以换成适合你的 Gradle 版本
 
     - name: Regenerate Gradle Wrapper
       working-directory: NavidromeMusicPlayer
