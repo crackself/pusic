@@ -1,30 +1,36 @@
-name: Android Build
+name: Android CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # 拉取完整的 Git 记录
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: 11
 
-      - name: Regenerate Gradle Wrapper
-        run: ./gradlew wrapper --gradle-version 8.5
-        working-directory: NavidromeMusicPlayer
+    - name: Regenerate Gradle Wrapper
+      run: |
+        cd NavidromeMusicPlayer
+        ./gradlew wrapper --gradle-version 8.5
+          
 
-      - name: Build with Gradle
-        run: ./gradlew build
-        working-directory: NavidromeMusicPlayer
+    - name: Build with Gradle
+      run: |
+        echo now directory
+        pwd
+        echo list files
+        ls
+        echo start build
+        ./gradlew assembleDebug
