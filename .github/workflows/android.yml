@@ -23,5 +23,7 @@ jobs:
     - name: Build with Gradle
       run: |
         cd NavidromeMusicPlayer
+        ls
         gradle wrapper
+        ls
         ./gradlew assembleDebug
