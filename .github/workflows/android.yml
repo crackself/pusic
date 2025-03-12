@@ -8,23 +8,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 拉取完整的 Git 记录
 
-      - name: Setup JDK
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-
-      - name: Fix line endings for gradlew
-        run: sed -i 's/\r$//' gradlew
-        working-directory: NavidromeMusicPlayer
-
-      - name: Grant Execute Permission for gradlew
-        run: chmod +x gradlew
-        working-directory: NavidromeMusicPlayer
 
       - name: Regenerate Gradle Wrapper
         run: ./gradlew wrapper --gradle-version 8.5
