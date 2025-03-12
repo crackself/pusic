@@ -1,0 +1,30 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.navidromemusicplayer">
+
+    <!-- 网络访问和下载权限 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:label="Navidrome Music Player"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        <!-- 启动页为登录页面 -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"/>
+        
+        <!-- 通知控制广播接收器 -->
+        <receiver android:name=".MediaNotificationReceiver"/>
+    </application>
+
+</manifest>
