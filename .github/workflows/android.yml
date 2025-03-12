@@ -33,4 +33,5 @@ jobs:
         echo list files
         ls
         echo start build
+        cd NavidromeMusicPlayer
         ./gradlew assembleDebug
