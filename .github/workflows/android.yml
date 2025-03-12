@@ -12,20 +12,24 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Fix line endings for gradlew
-        run: sed -i 's/\r$//' gradlew
-
-      - name: Grant Execute Permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Regenerate Gradle Wrapper
-        run: ./gradlew wrapper --gradle-version 8.5
-
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Fix line endings for gradlew
+        run: sed -i 's/\r$//' gradlew
+        working-directory: NavidromeMusicPlayer
+
+      - name: Grant Execute Permission for gradlew
+        run: chmod +x gradlew
+        working-directory: NavidromeMusicPlayer
+
+      - name: Regenerate Gradle Wrapper
+        run: ./gradlew wrapper --gradle-version 8.5
+        working-directory: NavidromeMusicPlayer
+
       - name: Build with Gradle
         run: ./gradlew build
+        working-directory: NavidromeMusicPlayer
