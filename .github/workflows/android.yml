@@ -23,7 +23,7 @@ jobs:
     - name: Regenerate Gradle Wrapper
       run: |
         cd NavidromeMusicPlayer
-        ./gradlew wrapper --gradle-version 8.5
+        ## ./gradlew wrapper --gradle-version 8.5
           
 
     - name: Build with Gradle
