@@ -5,9 +5,10 @@ plugins {
 
 android {
     compileSdkVersion 33
+    namespace "com.pusic"  // 修改为你的包名
 
     defaultConfig {
-        applicationId "com.example.navidromemusicplayer"
+        applicationId "com.pusic"
         minSdkVersion 21
         targetSdkVersion 33
         versionCode 1
