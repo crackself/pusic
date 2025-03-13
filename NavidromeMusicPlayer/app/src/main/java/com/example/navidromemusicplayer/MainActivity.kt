@@ -1,120 +1,103 @@
 package com.pusic
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.pusic.databinding.ActivityMainBinding
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
+import retrofit2.http.Query
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var player: ExoPlayer
+    private lateinit var trackAdapter: TrackAdapter
+    private lateinit var playlistAdapter: PlaylistAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-        // 初始化 ViewBinding
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        // 初始化播放器
+        player = ExoPlayer.Builder(this).build()
 
-        // 初始化 SharedPreferences
-        sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        // 设置曲目列表的布局管理器和适配器
+        recyclerViewTracks.layoutManager = LinearLayoutManager(this)
+        trackAdapter = TrackAdapter { track -> playTrack(track) }
+        recyclerViewTracks.adapter = trackAdapter
 
-        // 检查用户是否已登录
-        checkUserLogin()
+        // 设置播放列表的布局管理器和适配器
+        recyclerViewPlaylist.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        playlistAdapter = PlaylistAdapter { playlist -> loadPlaylist(playlist) }
+        recyclerViewPlaylist.adapter = playlistAdapter
 
-        // 设置 RecyclerView
-        setupRecyclerView()
+        // 设置按钮点击事件
+        btnPlayPause.setOnClickListener { togglePlayPause() }
+        btnNext.setOnClickListener { playNext() }
+        btnPrev.setOnClickListener { playPrevious() }
 
-        // 设置按钮监听
-        binding.btnLogin.setOnClickListener {
-            performLogin()
-        }
-
-        binding.btnLogout.setOnClickListener {
-            logout()
-        }
+        // 加载播放列表
+        loadPlaylists()
     }
 
-    /**
-     * 检查用户是否已登录
-     */
-    private fun checkUserLogin() {
-        val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
-        if (isLoggedIn) {
-            binding.etUsername.setText(sharedPreferences.getString("username", ""))
-            binding.etPassword.setText(sharedPreferences.getString("password", ""))
-            Toast.makeText(this, "已自动登录", Toast.LENGTH_SHORT).show()
-        }
+    private fun playTrack(track: Track) {
+        val mediaItem = MediaItem.fromUri(track.streamUrl)
+        player.setMediaItem(mediaItem)
+        player.prepare()
+        player.play()
     }
 
-    /**
-     * 执行登录逻辑
-     */
-    private fun performLogin() {
-        val username = binding.etUsername.text.toString().trim()
-        val password = binding.etPassword.text.toString().trim()
-
-        if (username.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "用户名和密码不能为空", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // 模拟登录验证（可以替换为 API 请求）
-        if (username == "admin" && password == "123456") {
-            // 保存登录状态
-            with(sharedPreferences.edit()) {
-                putBoolean("isLoggedIn", true)
-                putString("username", username)
-                putString("password", password)
-                apply()
-            }
-
-            Toast.makeText(this, "登录成功", Toast.LENGTH_SHORT).show()
-            navigateToHome()
+    private fun togglePlayPause() {
+        if (player.isPlaying) {
+            player.pause()
         } else {
-            Toast.makeText(this, "登录失败，请检查用户名或密码", Toast.LENGTH_SHORT).show()
+            player.play()
         }
     }
 
-    /**
-     * 退出登录
-     */
-    private fun logout() {
-        with(sharedPreferences.edit()) {
-            putBoolean("isLoggedIn", false)
-            putString("username", "")
-            putString("password", "")
-            apply()
+    private fun playNext() {
+        // 实现播放下一首曲目的逻辑
+    }
+
+    private fun playPrevious() {
+        // 实现播放上一首曲目的逻辑
+    }
+
+    private fun loadPlaylists() {
+        // 使用协程从服务器加载播放列表
+        CoroutineScope(Dispatchers.IO).launch {
+            val playlists = fetchPlaylists()
+            runOnUiThread {
+                playlistAdapter.submitList(playlists)
+            }
         }
-        Toast.makeText(this, "已退出登录", Toast.LENGTH_SHORT).show()
     }
 
-    /**
-     * 跳转到首页
-     */
-    private fun navigateToHome() {
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
-        finish()
+    private suspend fun fetchPlaylists(): List<Playlist> {
+        // 实现从服务器获取播放列表的逻辑
+        return emptyList()
     }
 
-    /**
-     * 设置 RecyclerView（示例）
-     */
-    private fun setupRecyclerView() {
-        binding.recyclerViewTracks.layoutManager = LinearLayoutManager(this)
-        binding.recyclerViewTracks.adapter = TrackAdapter(getDummyTracks())
+    override fun onDestroy() {
+        super.onDestroy()
+        player.release()
     }
+}
 
-    /**
-     * 模拟音乐数据
-     */
-    private fun getDummyTracks(): List<String> {
-        return listOf("Song 1", "Song 2", "Song 3", "Song 4", "Song 5")
-    }
+data class Track(val id: String, val title: String, val streamUrl: String)
+data class Playlist(val id: String, val name: String, val tracks: List<Track>)
+
+class TrackAdapter(private val onTrackClick: (Track) -> Unit) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+    // 实现适配器的必要方法
+}
+
+class PlaylistAdapter(private val onPlaylistClick: (Playlist) -> Unit) : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>() {
+    // 实现适配器的必要方法
 }
