@@ -29,9 +29,9 @@ jobs:
       working-directory: NavidromeMusicPlayer
       run: |
         echo "gradlew versiong is:"
-        ./gradlew --version
+        ./gradle --version
         echo "downgrade to use version 8.5"
-        ./gradlew wrapper
+        ./gradle wrapper
 
     - name: Build with Gradle
       working-directory: NavidromeMusicPlayer
